@@ -1,96 +1,113 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace ConsoleApp
+namespace Game21
 {
-    // Сделать телефонную книгу, где есть поля name, number и age, также и заполнение сделать
     class Program
     {
         static void Main(string[] args)
         {
-            Console.Write("Сколько у вас будет людей: ");
-            int count = int.Parse(Console.ReadLine());
+            Game game = new Game();
 
-            Console.WriteLine();
+            Player player = new Player();
+            Bot bot = new Bot();
 
-            string[] names = new string[count];
-            byte[] ages = new byte[count];
-            string[] numbers = new string[count];
+            var cardSuit = game.GetCardPack();
 
-            string input = string.Empty;
-            int i = 0;
-            // input data
-            while (i < count)
+            bool isPlayerPlay = true;
+            bool isBotPlay = true;
+
+            int counter = 0;
+
+            do
             {
-                Console.Write("Введи имя: ");
-                input = Console.ReadLine();
-
-                if (input == "-")
+                if (isBotPlay)
                 {
-                    break;
+                    isBotPlay = game.DrawCard(bot, cardSuit, counter);
+                    counter++;
                 }
 
-                names[i] = input;
-
-                Console.Write("Введи возраст: ");
-                input = Console.ReadLine();
-
-                if (input == "-")
+                if (isPlayerPlay)
                 {
-                    break;
+                    isPlayerPlay = game.DrawCard(player, cardSuit, counter);
+                    counter++;
                 }
+            } while (isPlayerPlay || isBotPlay);
 
-                ages[i] = byte.Parse(input);
+            // Определить победителя
+            PrintResultDelegate printResult = null;
 
-                Console.Write("Введи номер: ");
-                input = Console.ReadLine();
-
-                if (input == "-")
+            if (player._score > 21)
+            {
+                if (bot._score <= 21)
                 {
-                    break;
+                    printResult = PrintWinnerBot;
                 }
+                else
+                {
+                    printResult = PrintDraw;
+                }
+            }
+            else if (bot._score > 21)
+            {
+                if (player._score <= 21)
+                {
+                    printResult = PrintWinnerPlayer;
+                }
+                else
+                {
+                    printResult = PrintDraw;
+                }
+            }
+            else if (player._score > bot._score)
+            {
+                printResult = PrintWinnerPlayer;
+            }
+            else if (player._score < bot._score)
+            {
+                printResult = PrintWinnerBot;
+            }
+            else if (player._score == bot._score)
+            {
+                printResult = PrintDraw;
+            }
 
-                numbers[i] = input;
+            PrintScores(player, bot);
+            printResult();
+        }
 
-                i++;
 
+
+        private static void PrintScores(params IPlayer[] player)
+        {
+            Console.WriteLine("=== Scores ===");
+            Console.WriteLine("Player |\tBot");
+            for (int y = 0; y < 1; y++)
+            {
+                for (int x = 0; x < 1; x++)
+                {
+                    Console.Write($"{player[0]._score} |\t{player[1]._score}");
+                }
                 Console.WriteLine();
             }
+        }
 
-            // Write data
-            for (int j = 0; j < count; j++)
-            {
-                Console.Write("Имя: ");
-                Console.ForegroundColor = ConsoleColor.Green;
+        private delegate void PrintResultDelegate();
 
-                if (numbers[j] != String.Empty)
-                {
-                    Console.Write($"{names[j]} ");
-                }
+        private static void PrintWinnerBot()
+        {
+            Console.WriteLine("Вы проиграли! Победил бот!");
+        }
 
-                Console.ResetColor();
-                Console.Write("\t|\t");
+        private static void PrintWinnerPlayer()
+        {
+            Console.WriteLine("Вы победили!");
+        }
 
-                Console.Write("Возраст: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-
-                if (ages[j] != 0)
-                { 
-                    Console.Write($"{ages[j]} ");
-                }
-                
-                Console.ResetColor();
-                Console.Write("\t|\t");
-
-                Console.Write("номер: ");
-                Console.ForegroundColor = ConsoleColor.Red;
-
-                if (numbers[j] != String.Empty)
-                { 
-                    Console.Write($"{numbers[j]}\n");
-                }
-
-                Console.ResetColor();
-            }
+        private static void PrintDraw()
+        {
+            Console.WriteLine("Никто не победил!");
         }
     }
 }
