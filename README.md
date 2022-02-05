@@ -7,6 +7,7 @@
 #### Про ветки
 - main - информация о репозитории, чисто readme
 - homework/# (# - число, соответствующее номеру урока/видео, откуда была получена домашка)
+- sample - шаблон для домашних работ
 
 ***
 Ссылка на курс: <https://www.youtube.com/playlist?list=PLmmIuINqEtvzgWHVb08IT0B02LgCmfh1i>
